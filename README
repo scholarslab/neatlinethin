@@ -1,0 +1,9 @@
+Plugin Requirements:
+- Exhibit builder
+- Simple Pages
+- NeatlineMaps
+- NeatlineFeatures
+- Timeline
+- SolrSearch
+
+Need to patch ExhibitBuilder to include Neatline layouts

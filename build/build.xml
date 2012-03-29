@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : build.xml
+    Created on : November 17, 2010, 9:00 AM
+    Rev        : $Id$
+    Author     : wsg4w
+    Description:
+        Based on the Boilerplate build script, this build file minifies CSS and
+        Javascript for Omeka-based projects
+-->
+
+<project name="Omeka Theme Build" default="build" basedir="../">
+    <!-- load property files -->
+    <property file="build/build.properties" />
+    <property file="build/default.properties" />
+
+    <!-- Increase the current build number by one and set build date -->
+    <!-- as per http://www.ibmpressbooks.com/articles/article.aspx?p=519946 -->
+    <target name="rev" description="Increments the current build number and sets a build date">
+        <echo message="Rev the build number..."/>
+        <propertyfile file="./${dir.build}/${build.info}" comment="Build Information File - DO NOT EDIT">
+            <entry key="build.number" type="int" default="0000" operation="+" pattern="0000"/>
+            <entry key="build.date" type="date" value="now" pattern="dd.MM.yyyy HH:mm"/>
+        </propertyfile>
+	<property file="./${dir.build}/${build.info}"/>
+    </target>
+
+    <target name="current-number" description="Outputs the current build number">
+        <echo>Current build number: ${build.number}</echo>
+    </target>
+
+    <target name="clean" description="clean up">
+        <echo message="Cleaning up previous build directory..." />
+        <delete dir="./${dir.publish}" />
+    </target>
+    
+    <target name="copy" depends="clean, rev" description="copy files; ignore project/scm stuff">
+        <echo message="Copying files..." />
+        <copy todir="./${dir.publish}">
+            <fileset dir=".">
+                <exclude name=".gitignore" />
+                <exclude name=".project" />
+                <exclude name=".settings" />
+                <exclude name="README" />
+                <exclude name="**/.git/**" />
+                <exclude name="**/.svn/**" />
+                <exclude name="**/${dir.build}/**"/>
+                <exclude name="**/${dir.test}/**"/>
+                <exclude name="**/${dir.demo}/**"/>
+                <exclude name="**/${dir.js}/profiling/**"/>
+                <!-- configurable excludes -->
+                <exclude name="**/${file.exclude}/**" />
+            </fileset>
+        </copy>
+    </target>
+
+   <!-- JAVASCRIPT -->
+   <target name="js.minify">
+        <echo message="Minifying helper js files" />
+
+        <apply executable="java" parallel="false">
+            <fileset dir="./${dir.publish}/${dir.js.libs}/" includes="*.js" excludes="*.min.js" />
+            <arg line="-jar" />
+            <arg path="./${dir.tools}/${tool.yuicompressor}" />
+            <srcfile/>
+            <arg line="-o" />
+            <mapper type="glob" from="*.js" to="../${dir.publish}/${dir.js.libs}/*-${build.number}" />
+            <targetfile/>
+        </apply>
+    </target>
+    
+   <!-- CSS -->
+
+   <!-- IMAGES -->
+
+    
+
+    
+
+    <!--
+        CSS: minify css with yui compressor and replace reference to it in common/_header.php
+    -->
+    <target name="css" depends="copy">
+        <echo message="Minifying css..." />
+        <concat destfile="./${dir.publish}/${dir.css}/style-${build.number}.css">
+            <fileset file="./${dir.css}/style.css"/>
+        </concat>
+        <apply executable="java" parallel="false">
+            <fileset dir="./${dir.publish}/${dir.css}/" includes="style-${build.number}.css"/>
+            <arg line="-jar"/>
+            <arg path="./${dir.tools}/${tool.yuicompressor}"/>
+            <srcfile/>
+            <arg line="-o"/>
+            <mapper type="glob" from="style-${build.number}.css" to="../${dir.publish}/${dir.css}/style-${build.number}.min.css"/>
+            <targetfile/>
+        </apply>
+        <replace token="style" value="style-${build.number}.min" file="./${dir.publish}/${file.header}"/>
+        <!-- <delete file="./publish/css/style-${build.number}.css"/> -->
+  </target>
+  
+</project>

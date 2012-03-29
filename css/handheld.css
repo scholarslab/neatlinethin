@@ -1,0 +1,17 @@
+/* 
+    Document   : handheld
+    Created on : Oct 18, 2010, 12:37:12 PM
+    Author     : Scholars' Lab
+    Version    : $Id$
+    Description:
+        Stylesheet for less-enabled mobile browsers like Opera Mini
+    
+*/
+
+* {
+  float: none;       /* Screens are not big enough to account for floats */
+  font-size: 80%;    /* Slightly reducing font size to reduce need to scroll */
+  background: #fff;  /*  As much contrast as possible */
+  color: #000;
+}
+
